@@ -10,6 +10,7 @@ export default function RightSidebar({
   chatLoading,
   indexing,
   chatEndRef,
+  isDark = true,
   onToggle,
   onChatInputChange,
   onSendChat,
@@ -23,6 +24,7 @@ export default function RightSidebar({
   chatLoading: boolean;
   indexing: boolean;
   chatEndRef: React.RefObject<HTMLDivElement | null>;
+  isDark?: boolean;
   onToggle: () => void;
   onChatInputChange: (value: string) => void;
   onSendChat: () => void;
@@ -33,7 +35,7 @@ export default function RightSidebar({
       <button
         type="button"
         onClick={onToggle}
-        className="absolute right-0 top-14 z-10 rounded-l border border-r-0 border-[var(--border)] bg-[var(--sidebar-bg)] p-2 text-[#8b949e] hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
+        className="absolute right-0 top-14 z-10 rounded-l border border-r-0 border-[var(--border)] bg-[var(--sidebar-bg)] p-2 text-[var(--muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
         aria-label="Open AI assistant"
       >
         <svg
@@ -60,7 +62,7 @@ export default function RightSidebar({
         <button
           type="button"
           onClick={onToggle}
-          className="rounded p-1 text-[#8b949e] hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)] lg:hidden"
+          className="rounded p-1 text-[var(--muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)] lg:hidden"
           aria-label="Close chat"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -72,7 +74,7 @@ export default function RightSidebar({
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto overflow-x-auto p-4 space-y-4">
           {chatMessages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center text-[#8b949e]">
+            <div className="flex flex-col items-center justify-center h-full text-center text-[var(--muted)]">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-3 opacity-50">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
@@ -90,11 +92,11 @@ export default function RightSidebar({
                 className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-md ${
                   msg.role === "user"
                     ? "bg-[var(--chat-user-bg)] text-[var(--foreground)] rounded-br-md"
-                    : "bg-[var(--chat-ai-bg)] text-[#e6edf3] rounded-bl-md"
+                    : "bg-[var(--chat-ai-bg)] text-[var(--foreground)] rounded-bl-md"
                 }`}
               >
                 {msg.role === "ai" ? (
-                  <ChatMarkdown content={msg.content} />
+                  <ChatMarkdown content={msg.content} isDark={isDark} />
                 ) : (
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 )}
@@ -104,7 +106,7 @@ export default function RightSidebar({
           {chatLoading && chatMessages[chatMessages.length - 1]?.content === "" && (
             <div className="flex justify-start">
               <div className="rounded-2xl rounded-bl-md bg-[var(--chat-ai-bg)] px-4 py-3 shadow-md">
-                <span className="text-sm text-[#8b949e] animate-pulse">Thinking...</span>
+                <span className="text-sm text-[var(--muted)] animate-pulse">Thinking...</span>
               </div>
             </div>
           )}
@@ -128,7 +130,7 @@ export default function RightSidebar({
               value={chatInput}
               onChange={(e) => onChatInputChange(e.target.value)}
               disabled={!projectId || chatLoading}
-              className="min-w-0 flex-1 bg-transparent text-sm text-[var(--foreground)] placeholder:text-[#8b949e] focus:outline-none disabled:opacity-50"
+              className="min-w-0 flex-1 bg-transparent text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none disabled:opacity-50"
             />
             <button
               type="submit"

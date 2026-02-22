@@ -5,12 +5,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 type Props = {
   content: string;
+  isDark?: boolean;
 };
 
-export default function ChatMarkdown({ content }: Props) {
+export default function ChatMarkdown({ content, isDark = true }: Props) {
   return (
     <div className="chat-markdown text-sm leading-relaxed">
       <ReactMarkdown
@@ -25,6 +27,7 @@ export default function ChatMarkdown({ content }: Props) {
                 <CodeBlock
                   code={codeString}
                   language={match[1]}
+                  isDark={isDark}
                 />
               );
             }
@@ -95,9 +98,11 @@ function parseFileHint(code: string): { filePath?: string; cleanCode: string } {
 function CodeBlock({
   code,
   language,
+  isDark = true,
 }: {
   code: string;
   language: string;
+  isDark?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const { filePath, cleanCode } = parseFileHint(code);
@@ -126,7 +131,7 @@ function CodeBlock({
       </div>
       <SyntaxHighlighter
         language={language}
-        style={oneDark}
+        style={isDark ? oneDark : oneLight}
         customStyle={{
           margin: 0,
           borderRadius: 0,

@@ -135,6 +135,7 @@ export default function Home() {
           chatLoading={chat.chatLoading}
           indexing={project.indexing}
           chatEndRef={chat.chatEndRef}
+          isDark={currentTheme.monacoTheme !== "vs"}
           onToggle={() => layout.setRightOpen((v) => !v)}
           onChatInputChange={chat.setChatInput}
           onSendChat={chat.sendChat}

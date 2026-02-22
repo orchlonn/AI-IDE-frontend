@@ -4,7 +4,7 @@ export type CodeChunk = {
   content: string;
 };
 
-const CHUNK_SIZE = 200; // lines per chunk
+const CHUNK_SIZE = 100; // lines per chunk
 const OVERLAP = 20; // overlapping lines between chunks
 
 /**

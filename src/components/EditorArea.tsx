@@ -62,21 +62,21 @@ export default function EditorArea({
           <span className="truncate text-sm font-medium">
             {currentFileName}
           </span>
-          <span className="rounded bg-[var(--hover-bg)] px-2 py-0.5 text-xs text-[#8b949e]">
+          <span className="rounded bg-[var(--hover-bg)] px-2 py-0.5 text-xs text-[var(--muted)]">
             {language}
           </span>
         </div>
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="rounded px-2 py-1 text-xs text-[#8b949e] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
+            className="rounded px-2 py-1 text-xs text-[var(--muted)] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
           >
             Save
           </button>
           <button
             type="button"
             onClick={onFormat}
-            className="rounded px-2 py-1 text-xs text-[#8b949e] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
+            className="rounded px-2 py-1 text-xs text-[var(--muted)] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
           >
             Format
           </button>
