@@ -7,6 +7,7 @@ export function useChat(
   projectId: string | null,
   selectedPath: string,
   code: string,
+  onApplyCode?: (code: string, filePath?: string) => void,
 ) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -48,7 +49,7 @@ export function useChat(
     setChatMessages((prev) => [...prev, aiMsg]);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -102,8 +103,24 @@ export function useChat(
         ),
       );
     }
+
+    // Auto-apply code blocks from the response
+    if (onApplyCode && streamingRef.current) {
+      const codeBlockRegex = /```[\w]*\n([\s\S]*?)```/g;
+      let match;
+      while ((match = codeBlockRegex.exec(streamingRef.current)) !== null) {
+        const blockContent = match[1];
+        const fileHint = blockContent.match(/^\/\/\s*file:\s*(.+)\n/);
+        if (fileHint) {
+          const filePath = fileHint[1].trim();
+          const cleanCode = blockContent.replace(fileHint[0], "");
+          onApplyCode(cleanCode, filePath);
+        }
+      }
+    }
+
     setChatLoading(false);
-  }, [chatInput, projectId, chatLoading, chatMessages, selectedPath, code, flushStreaming]);
+  }, [chatInput, projectId, chatLoading, chatMessages, selectedPath, code, flushStreaming, onApplyCode]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {

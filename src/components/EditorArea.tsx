@@ -1,6 +1,6 @@
 "use client";
 
-import Editor, { DiffEditor, type OnMount } from "@monaco-editor/react";
+import Editor, { type OnMount } from "@monaco-editor/react";
 import dynamic from "next/dynamic";
 import type { TerminalHandle } from "@/components/Terminal";
 import type { FileNode } from "@/types";
@@ -12,7 +12,6 @@ const Terminal = dynamic(() => import("@/components/Terminal"), { ssr: false });
 export default function EditorArea({
   currentFileName,
   language,
-  diffMode,
   canRun,
   code,
   selectedPath,
@@ -22,8 +21,6 @@ export default function EditorArea({
   onCodeChange,
   onFormat,
   onRunFile,
-  onAcceptDiff,
-  onRejectDiff,
   onUploadFiles,
   onUploadFolder,
   terminalOpen,
@@ -37,7 +34,6 @@ export default function EditorArea({
 }: {
   currentFileName: string;
   language: string;
-  diffMode: { original: string; modified: string; language: string; targetPath: string } | null;
   canRun: boolean;
   code: string;
   selectedPath: string;
@@ -47,8 +43,6 @@ export default function EditorArea({
   onCodeChange: (code: string) => void;
   onFormat: () => void;
   onRunFile: () => void;
-  onAcceptDiff: () => void;
-  onRejectDiff: () => void;
   onUploadFiles: () => void;
   onUploadFolder: () => void;
   terminalOpen: boolean;
@@ -71,65 +65,39 @@ export default function EditorArea({
           <span className="rounded bg-[var(--hover-bg)] px-2 py-0.5 text-xs text-[#8b949e]">
             {language}
           </span>
-          {diffMode && (
-            <span className="rounded bg-[var(--accent-muted)] px-2 py-0.5 text-xs text-[var(--accent)]">
-              Review Changes
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-1">
-          {diffMode ? (
-            <>
-              <button
-                type="button"
-                onClick={onAcceptDiff}
-                className="rounded bg-green-600 px-3 py-1 text-xs text-white transition-colors hover:bg-green-500"
+          <button
+            type="button"
+            className="rounded px-2 py-1 text-xs text-[#8b949e] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={onFormat}
+            className="rounded px-2 py-1 text-xs text-[#8b949e] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
+          >
+            Format
+          </button>
+          {canRun && (
+            <button
+              type="button"
+              onClick={onRunFile}
+              className="flex items-center gap-1 rounded bg-[#238636] px-2.5 py-1 text-xs text-white transition-colors hover:bg-[#2ea043]"
+              title="Run file"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                stroke="none"
               >
-                Accept
-              </button>
-              <button
-                type="button"
-                onClick={onRejectDiff}
-                className="rounded bg-red-600 px-3 py-1 text-xs text-white transition-colors hover:bg-red-500"
-              >
-                Reject
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="rounded px-2 py-1 text-xs text-[#8b949e] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                onClick={onFormat}
-                className="rounded px-2 py-1 text-xs text-[#8b949e] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--foreground)]"
-              >
-                Format
-              </button>
-              {canRun && (
-                <button
-                  type="button"
-                  onClick={onRunFile}
-                  className="flex items-center gap-1 rounded bg-[#238636] px-2.5 py-1 text-xs text-white transition-colors hover:bg-[#2ea043]"
-                  title="Run file"
-                >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    stroke="none"
-                  >
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  Run
-                </button>
-              )}
-            </>
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              Run
+            </button>
           )}
         </div>
       </div>
@@ -138,22 +106,6 @@ export default function EditorArea({
       <div className="flex-1 min-h-0">
         {fileTree.length === 0 ? (
           <WelcomeScreen onUploadFiles={onUploadFiles} onUploadFolder={onUploadFolder} />
-        ) : diffMode ? (
-          <DiffEditor
-            theme={monacoTheme}
-            language={diffMode.language}
-            original={diffMode.original}
-            modified={diffMode.modified}
-            options={{
-              fontSize: 14,
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              padding: { top: 16 },
-              readOnly: true,
-              renderSideBySide: true,
-              automaticLayout: true,
-            }}
-          />
         ) : (
           <Editor
             theme={monacoTheme}

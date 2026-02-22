@@ -95,7 +95,7 @@ const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Terminal({ o
       if (/^cd\s/.test(trimmed) || trimmed === "cd") {
         const target = trimmed.replace(/^cd\s*/, "").trim() || "~";
         try {
-          const res = await fetch("/api/terminal", {
+          const res = await fetch("http://localhost:8000/api/terminal", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -131,7 +131,7 @@ const Terminal = forwardRef<TerminalHandle, TerminalProps>(function Terminal({ o
         if (file) {
           body.file = file;
         }
-        const res = await fetch("/api/terminal", {
+        const res = await fetch("http://localhost:8000/api/terminal", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),

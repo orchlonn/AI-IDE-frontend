@@ -8,11 +8,9 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 type Props = {
   content: string;
-  onReviewCode?: (code: string, filePath?: string) => void;
-  onApplyCode?: (code: string, filePath?: string) => void;
 };
 
-export default function ChatMarkdown({ content, onReviewCode, onApplyCode }: Props) {
+export default function ChatMarkdown({ content }: Props) {
   return (
     <div className="chat-markdown text-sm leading-relaxed">
       <ReactMarkdown
@@ -27,8 +25,6 @@ export default function ChatMarkdown({ content, onReviewCode, onApplyCode }: Pro
                 <CodeBlock
                   code={codeString}
                   language={match[1]}
-                  onReview={onReviewCode}
-                  onApply={onApplyCode}
                 />
               );
             }
@@ -99,28 +95,17 @@ function parseFileHint(code: string): { filePath?: string; cleanCode: string } {
 function CodeBlock({
   code,
   language,
-  onReview,
-  onApply,
 }: {
   code: string;
   language: string;
-  onReview?: (code: string, filePath?: string) => void;
-  onApply?: (code: string, filePath?: string) => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const [applied, setApplied] = useState(false);
   const { filePath, cleanCode } = parseFileHint(code);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(cleanCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleApply = () => {
-    onApply?.(cleanCode, filePath);
-    setApplied(true);
-    setTimeout(() => setApplied(false), 2000);
   };
 
   return (
@@ -130,24 +115,6 @@ function CodeBlock({
           {filePath ? filePath : language}
         </span>
         <div className="flex items-center gap-1">
-          {onApply && (
-            <button
-              type="button"
-              onClick={handleApply}
-              className="rounded px-2 py-0.5 text-xs font-medium text-green-400 transition-colors hover:bg-[var(--hover-bg)]"
-            >
-              {applied ? "Applied!" : "Apply"}
-            </button>
-          )}
-          {onReview && (
-            <button
-              type="button"
-              onClick={() => onReview(cleanCode, filePath)}
-              className="rounded px-2 py-0.5 text-xs text-[var(--accent)] transition-colors hover:bg-[var(--hover-bg)]"
-            >
-              Review
-            </button>
-          )}
           <button
             type="button"
             onClick={handleCopy}

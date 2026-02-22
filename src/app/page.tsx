@@ -26,11 +26,6 @@ export default function Home() {
   const layout = useLayout();
   const fileManager = useFileManager(showToast);
   const project = useProject(showToast, fileManager);
-  const chat = useChat(
-    project.projectId,
-    fileManager.selectedPath,
-    fileManager.code,
-  );
   const codeReview = useCodeReview(
     fileManager.selectedPath,
     fileManager.code,
@@ -45,6 +40,12 @@ export default function Home() {
       setLanguage: fileManager.setLanguage,
       setCode: fileManager.setCode,
     },
+  );
+  const chat = useChat(
+    project.projectId,
+    fileManager.selectedPath,
+    fileManager.code,
+    codeReview.handleApplyCode,
   );
   const dragDrop = useDragDrop(
     fileManager.processFiles,
@@ -102,7 +103,6 @@ export default function Home() {
         <EditorArea
           currentFileName={fileManager.currentFileName}
           language={fileManager.language}
-          diffMode={codeReview.diffMode}
           canRun={
             !!getRunCommand(fileManager.currentFileName, fileManager.language)
           }
@@ -114,8 +114,6 @@ export default function Home() {
           onCodeChange={fileManager.handleCodeChange}
           onFormat={fileManager.handleFormat}
           onRunFile={terminal.handleRunFile}
-          onAcceptDiff={codeReview.acceptDiff}
-          onRejectDiff={codeReview.rejectDiff}
           onUploadFiles={() => fileManager.fileInputRef.current?.click()}
           onUploadFolder={() => fileManager.folderInputRef.current?.click()}
           terminalOpen={layout.terminalOpen}
@@ -140,8 +138,6 @@ export default function Home() {
           onToggle={() => layout.setRightOpen((v) => !v)}
           onChatInputChange={chat.setChatInput}
           onSendChat={chat.sendChat}
-          onReviewCode={codeReview.handleReviewCode}
-          onApplyCode={codeReview.handleApplyCode}
           onResizeStart={layout.handleRightResizeStart}
         />
       </div>
@@ -167,14 +163,8 @@ export default function Home() {
 
       <Toast
         toast={toast}
-        showUndo={
-          !!codeReview.lastApplied.current &&
-          !!toast?.message.startsWith("Applied to")
-        }
-        onUndo={() => {
-          codeReview.undoLastApply();
-          dismissToast();
-        }}
+        showUndo={false}
+        onUndo={() => dismissToast()}
         onDismiss={dismissToast}
       />
     </div>

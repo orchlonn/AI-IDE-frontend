@@ -13,8 +13,6 @@ export default function RightSidebar({
   onToggle,
   onChatInputChange,
   onSendChat,
-  onReviewCode,
-  onApplyCode,
   onResizeStart,
 }: {
   isOpen: boolean;
@@ -28,8 +26,6 @@ export default function RightSidebar({
   onToggle: () => void;
   onChatInputChange: (value: string) => void;
   onSendChat: () => void;
-  onReviewCode: (code: string, filePath?: string) => void;
-  onApplyCode: (code: string, filePath?: string) => void;
   onResizeStart: (e: React.MouseEvent) => void;
 }) {
   if (!isOpen) {
@@ -98,7 +94,7 @@ export default function RightSidebar({
                 }`}
               >
                 {msg.role === "ai" ? (
-                  <ChatMarkdown content={msg.content} onReviewCode={onReviewCode} onApplyCode={onApplyCode} />
+                  <ChatMarkdown content={msg.content} />
                 ) : (
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 )}
