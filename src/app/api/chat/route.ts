@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { getOpenAI } from "@/lib/openai";
 
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
+
 export async function POST(req: NextRequest) {
   try {
     const { project_id, question, history, current_file } = await req.json();
@@ -15,12 +17,16 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabase();
     const openai = getOpenAI();
 
-    // Embed the question
-    const embRes = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: question,
+    // Embed the question via backend
+    const embRes = await fetch(`${BACKEND_URL}/api/embed-query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: question }),
     });
-    const queryEmbedding = embRes.data[0].embedding;
+    if (!embRes.ok) {
+      throw new Error(`Embed query failed: ${embRes.statusText}`);
+    }
+    const { embedding: queryEmbedding } = await embRes.json();
 
     // Retrieve relevant chunks via pgvector similarity search
     const { data: matches, error: matchErr } = await supabase.rpc(

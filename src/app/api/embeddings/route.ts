@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
-import { getOpenAI } from "@/lib/openai";
 import { chunkProject } from "@/lib/chunker";
+
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +12,6 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = getSupabase();
-    const openai = getOpenAI();
 
     // Load project
     const { data: project, error: projErr } = await supabase
@@ -34,19 +34,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ chunksIndexed: 0 });
     }
 
-    // Generate embeddings in batches of 100
+    // Generate embeddings via backend in batches of 100
     const BATCH = 100;
     const embeddings: number[][] = [];
 
     for (let i = 0; i < chunks.length; i += BATCH) {
       const batch = chunks.slice(i, i + BATCH);
-      const res = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: batch.map((c) => c.content),
+      const res = await fetch(`${BACKEND_URL}/api/embed`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texts: batch.map((c) => c.content) }),
       });
-      for (const item of res.data) {
-        embeddings.push(item.embedding);
+      if (!res.ok) {
+        throw new Error(`Embed request failed: ${res.statusText}`);
       }
+      const data = await res.json();
+      embeddings.push(...data.embeddings);
     }
 
     // Delete old chunks for this project
